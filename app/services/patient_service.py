@@ -1,5 +1,7 @@
+
 from app.models.patient import Patient
 from app.repositories.patient_repository import PatientRepository
+
 
 
 class PatientService:
@@ -15,7 +17,6 @@ class PatientService:
         phone,
         address
     ):
-
         if not name:
             raise ValueError("Patient name is required")
 
@@ -34,12 +35,11 @@ class PatientService:
         )
 
         return self.repository.add_patient(patient)
-    def get_all_patients(self):
 
+    def get_all_patients(self):
         return self.repository.get_all_patients()
 
     def get_patient_by_id(self, patient_id):
-
         if patient_id <= 0:
             raise ValueError("Patient ID must be greater than 0")
 
@@ -54,7 +54,6 @@ class PatientService:
         phone,
         address
     ):
-
         if patient_id <= 0:
             raise ValueError("Patient ID must be greater than 0")
 
@@ -79,7 +78,6 @@ class PatientService:
         return self.repository.update_patient(patient)
 
     def delete_patient(self, patient_id):
-
         if patient_id <= 0:
             raise ValueError("Patient ID must be greater than 0")
 
