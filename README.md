@@ -184,7 +184,7 @@ Run the test suite:
 
 ```bash
 
-pytest
+python -m pytest
 
 ```
 
@@ -196,7 +196,7 @@ Run tests with coverage:
 
 ```bash
 
-pytest --cov=app --cov-report=term-missing
+python -m pytest --cov=app --cov-report=term-missing
 
 ```
 
