@@ -232,5 +232,145 @@ pytest --cov=app --cov-report=term-missing
 
 GitHub: \[pylearnstart-max](https://github.com/pylearnstart-max)
 
+\## API Documentation
+
+
+
+\*\*Base URL:\*\* `http://127.0.0.1:5000`
+
+
+
+\### Patient Endpoints
+
+
+
+| Method | Endpoint                     | Description       |
+
+| ------ | ---------------------------- | ----------------- |
+
+| POST   | `/api/patients`              | Create a patient  |
+
+| GET    | `/api/patients`              | Get all patients  |
+
+| GET    | `/api/patients/<patient\_id>` | Get patient by ID |
+
+| PUT    | `/api/patients/<patient\_id>` | Update patient    |
+
+| DELETE | `/api/patients/<patient\_id>` | Delete patient    |
+
+
+
+\### Doctor Endpoints
+
+
+
+| Method | Endpoint               | Description      |
+
+| ------ | ---------------------- | ---------------- |
+
+| POST   | `/doctors`             | Create a doctor  |
+
+| GET    | `/doctors`             | Get all doctors  |
+
+| GET    | `/doctors/<doctor\_id>` | Get doctor by ID |
+
+| PUT    | `/doctors/<doctor\_id>` | Update doctor    |
+
+| DELETE | `/doctors/<doctor\_id>` | Delete doctor    |
+
+
+
+\### Appointment Endpoints
+
+
+
+| Method | Endpoint                         | Description           |
+
+| ------ | -------------------------------- | --------------------- |
+
+| POST   | `/appointments`                  | Book an appointment   |
+
+| GET    | `/appointments`                  | Get all appointments  |
+
+| GET    | `/appointments/<appointment\_id>` | Get appointment by ID |
+
+| PUT    | `/appointments/<appointment\_id>` | Update appointment    |
+
+| DELETE | `/appointments/<appointment\_id>` | Delete appointment    |
+
+
+
+\### Example: Create a Doctor
+
+
+
+\*\*POST\*\* `/doctors`
+
+
+
+Request JSON:
+
+
+
+```json
+
+{
+
+&#x20; "name": "Dr. Ravi Kumar",
+
+&#x20; "specialization": "Cardiology",
+
+&#x20; "phone": "9876543210",
+
+&#x20; "email": "ravi@example.com",
+
+&#x20; "consultation\_fee": 500
+
+}
+
+```
+
+
+
+Successful response: `201 Created`
+
+
+
+```json
+
+{
+
+&#x20; "message": "Doctor added successfully"
+
+}
+
+```
+
+
+
+\### HTTP Status Codes
+
+
+
+\* `200 OK` — Request completed successfully.
+
+\* `201 Created` — Resource created successfully.
+
+\* `400 Bad Request` — Invalid input or validation error.
+
+\* `404 Not Found` — Requested resource not found.
+
+\* `500 Internal Server Error` — Unexpected server error.
+
+
+
+\### API Testing with Postman
+
+
+
+Use Postman to test the endpoints. For POST and PUT requests, select \*\*Body → raw → JSON\*\*, provide the request data, and verify the response status and body.
+
+
+
 
 
