@@ -1,3 +1,4 @@
+from app.exceptions.custom_exceptions import ValidationError
 
 from app.models.patient import Patient
 from app.repositories.patient_repository import PatientRepository
@@ -18,13 +19,13 @@ class PatientService:
         address
     ):
         if not name:
-            raise ValueError("Patient name is required")
+            raise ValidationError("Patient name is required")
 
         if age is not None and age <= 0:
-            raise ValueError("Age must be greater than 0")
+            raise ValidationError("Age must be greater than 0")
 
         if not phone:
-            raise ValueError("Phone number is required")
+            raise ValidationError("Phone number is required")
 
         patient = Patient(
             name=name,
@@ -41,7 +42,7 @@ class PatientService:
 
     def get_patient_by_id(self, patient_id):
         if patient_id <= 0:
-            raise ValueError("Patient ID must be greater than 0")
+            raise ValidationError("Patient ID must be greater than 0")
 
         return self.repository.get_patient_by_id(patient_id)
 
@@ -55,16 +56,16 @@ class PatientService:
         address
     ):
         if patient_id <= 0:
-            raise ValueError("Patient ID must be greater than 0")
+            raise ValidationError("Patient ID must be greater than 0")
 
         if not name:
-            raise ValueError("Patient name is required")
+            raise ValidationError("Patient name is required")
 
         if age is not None and age <= 0:
-            raise ValueError("Age must be greater than 0")
+            raise ValidationError("Age must be greater than 0")
 
         if not phone:
-            raise ValueError("Phone number is required")
+            raise ValidationError("Phone number is required")
 
         patient = Patient(
             patient_id=patient_id,
@@ -79,6 +80,6 @@ class PatientService:
 
     def delete_patient(self, patient_id):
         if patient_id <= 0:
-            raise ValueError("Patient ID must be greater than 0")
+            raise ValidationError("Patient ID must be greater than 0")
 
         return self.repository.delete_patient(patient_id)

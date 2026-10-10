@@ -1,5 +1,4 @@
-
-class ValidationError(Exception):
+class ValidationError(ValueError):
     """Raised when input validation fails."""
     pass
 

@@ -1,4 +1,4 @@
-﻿
+
 from run import app
 from unittest.mock import patch
 from app.models.doctor import Doctor
@@ -402,3 +402,31 @@ def test_delete_nonexistent_appointment_returns_404():
 
     assert response.status_code == 404
     assert response.get_json()["error"] == "Appointment not found"
+
+def test_central_500_error_handler():
+    original_testing = app.testing
+    original_propagate = app.config.get("PROPAGATE_EXCEPTIONS")
+    original_home = app.view_functions["home"]
+
+    def broken_home():
+        raise RuntimeError("Test-only simulated error")
+
+    try:
+        app.testing = False
+        app.config["PROPAGATE_EXCEPTIONS"] = False
+        app.view_functions["home"] = broken_home
+
+        response = app.test_client().get("/")
+
+        assert response.status_code == 500
+        assert response.get_json() == {
+            "error": "Internal server error"
+        }
+    finally:
+        app.view_functions["home"] = original_home
+        app.testing = original_testing
+
+        if original_propagate is None:
+            app.config.pop("PROPAGATE_EXCEPTIONS", None)
+        else:
+            app.config["PROPAGATE_EXCEPTIONS"] = original_propagate
