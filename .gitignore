@@ -20,3 +20,6 @@ htmlcov/
 # IDE files
 .vscode/
 .idea/
+# Local test backups
+
+tests/backup_before_jwt_fix/

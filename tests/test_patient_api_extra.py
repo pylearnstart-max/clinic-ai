@@ -7,10 +7,19 @@ from app.models.patient import Patient
 
 
 @pytest.fixture
-def client():
+def client(monkeypatch):
+    from app.auth import auth_decorator
+
     app.config["TESTING"] = True
 
+    monkeypatch.setattr(
+        auth_decorator.auth_service,
+        "verify_token",
+        lambda token: {"user_id": "1", "role": "admin"}
+    )
+
     with app.test_client() as test_client:
+        test_client.environ_base["HTTP_AUTHORIZATION"] = "Bearer test-token"
         yield test_client
 
 

@@ -1,6 +1,9 @@
 
 from flask import Blueprint, request, jsonify
+
 from app.services.patient_service import PatientService
+from app.auth.auth_decorator import require_auth
+
 
 patient_api = Blueprint(
     "patient_api",
@@ -22,7 +25,9 @@ def patient_to_dict(patient):
     }
 
 
+# Create a new patient
 @patient_api.route("/patients", methods=["POST"])
+@require_auth
 def add_patient():
     data = request.get_json(silent=True)
 
@@ -53,7 +58,9 @@ def add_patient():
         }), 500
 
 
+# Get all patients
 @patient_api.route("/patients", methods=["GET"])
+@require_auth
 def get_all_patients():
     try:
         search = request.args.get("search")
@@ -67,8 +74,8 @@ def get_all_patients():
             type=int
         )
 
-        # Preserve the existing list response when no
-        # search, filter, or pagination parameters are supplied.
+        # Preserve the original list response when
+        # no search, filter, or pagination is supplied.
         has_parameters = any(
             key in request.args
             for key in (
@@ -88,7 +95,7 @@ def get_all_patients():
                 for patient in patients
             ]), 200
 
-        # Reject invalid integer query parameters.
+        # Validate integer query parameters
         for key in ("min_age", "max_age", "page", "per_page"):
             if key in request.args:
                 try:
@@ -125,10 +132,12 @@ def get_all_patients():
         }), 500
 
 
+# Get a patient by ID
 @patient_api.route(
     "/patients/<int:patient_id>",
     methods=["GET"]
 )
+@require_auth
 def get_patient_by_id(patient_id):
     try:
         patient = patient_service.get_patient_by_id(patient_id)
@@ -149,10 +158,12 @@ def get_patient_by_id(patient_id):
         }), 500
 
 
+# Update a patient
 @patient_api.route(
     "/patients/<int:patient_id>",
     methods=["PUT"]
 )
+@require_auth
 def update_patient(patient_id):
     data = request.get_json(silent=True)
 
@@ -189,10 +200,12 @@ def update_patient(patient_id):
         }), 500
 
 
+# Delete a patient
 @patient_api.route(
     "/patients/<int:patient_id>",
     methods=["DELETE"]
 )
+@require_auth
 def delete_patient(patient_id):
     try:
         deleted = patient_service.delete_patient(patient_id)
