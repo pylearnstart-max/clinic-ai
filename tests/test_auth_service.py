@@ -101,3 +101,20 @@ def test_verify_token_rejects_empty_claim_value(claim_name):
 
     with pytest.raises(ValueError, match="Invalid token"):
         service.verify_token(token)
+
+def test_verify_token_rejects_missing_token():
+    service = AuthService()
+    service.secret_key = "test-secret-key-for-jwt-32-bytes-minimum"
+
+    with pytest.raises(ValueError, match="Token is required"):
+        service.verify_token("")
+
+def test_verify_token_rejects_missing_secret_key():
+    service = AuthService()
+    service.secret_key = None
+
+    with pytest.raises(
+        RuntimeError,
+        match="JWT_SECRET_KEY is not configured",
+    ):
+        service.verify_token("some-token")
