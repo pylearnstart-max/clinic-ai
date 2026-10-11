@@ -166,3 +166,11 @@ def test_verify_token_rejects_future_iat():
 
     with pytest.raises(ValueError, match="Invalid token"):
         service.verify_token(token)
+
+
+def test_verify_token_rejects_malformed_token():
+    service = AuthService()
+    service.secret_key = "test-secret-key-for-jwt-32-bytes-minimum"
+
+    with pytest.raises(ValueError, match="Invalid token"):
+        service.verify_token("this-is-not-a-valid-jwt")
