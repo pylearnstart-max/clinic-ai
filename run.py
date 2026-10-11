@@ -6,6 +6,7 @@ from app.api.patient_api import patient_api
 from app.api.doctor_api import doctor_api
 from app.api.appointment_api import appointment_api
 from app.auth.auth_api import auth_api
+from app.api.clinic_assistant_api import clinic_assistant_api
 
 logging.basicConfig(
     level=logging.INFO,
@@ -18,6 +19,7 @@ app.register_blueprint(patient_api)
 app.register_blueprint(doctor_api)
 app.register_blueprint(appointment_api)
 app.register_blueprint(auth_api)
+app.register_blueprint(clinic_assistant_api)
 
 
 @app.errorhandler(500)
