@@ -12,7 +12,8 @@ class ClinicState(TypedDict):
 
 # 2. Router: identify the message type
 def classify_message(state: ClinicState):
-    message = state["message"].strip().lower()
+
+    message = state.get("message", "").strip().lower()
 
     if not message:
         category = "empty"
