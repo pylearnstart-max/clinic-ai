@@ -15,16 +15,19 @@ def client(monkeypatch):
     def admin_route():
         return jsonify({"message": "Admin access granted"}), 200
 
+    def fake_verify_token(token):
+        if token == "user-token":
+            return {"user_id": 1, "role": "user"}
+
+        if token == "admin-token":
+            return {"user_id": 2, "role": "admin"}
+
+        raise ValueError("Invalid token")
+
     monkeypatch.setattr(
         auth_decorator.auth_service,
         "verify_token",
-        lambda token: {
-            "user_id": 1,
-            "role": "user"
-        } if token == "user-token" else {
-            "user_id": 2,
-            "role": "admin"
-        }
+        fake_verify_token,
     )
 
     return app.test_client()
@@ -53,3 +56,13 @@ def test_admin_role_can_access_admin_route(client):
 
     assert response.status_code == 200
     assert response.get_json()["message"] == "Admin access granted"
+
+
+def test_invalid_token_returns_401(client):
+    response = client.get(
+        "/admin",
+        headers={"Authorization": "Bearer invalid-token"}
+    )
+
+    assert response.status_code == 401
+    assert response.get_json()["error"] == "Invalid token"
