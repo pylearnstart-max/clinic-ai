@@ -66,3 +66,33 @@ def test_invalid_token_returns_401(client):
 
     assert response.status_code == 401
     assert response.get_json()["error"] == "Invalid token"
+
+def test_basic_authorization_scheme_returns_401(client):
+    response = client.get(
+        "/admin",
+        headers={"Authorization": "Basic abc"}
+    )
+
+    assert response.status_code == 401
+    assert response.get_json()["error"] == "Bearer token is required"
+
+
+def test_bearer_without_token_returns_401(client):
+    response = client.get(
+        "/admin",
+        headers={"Authorization": "Bearer"}
+    )
+
+    assert response.status_code == 401
+    assert response.get_json()["error"] == "Bearer token is required"
+
+
+def test_bearer_with_extra_value_returns_401(client):
+    response = client.get(
+        "/admin",
+        headers={"Authorization": "Bearer token extra"}
+    )
+
+    assert response.status_code == 401
+    assert response.get_json()["error"] == "Bearer token is required"
+
