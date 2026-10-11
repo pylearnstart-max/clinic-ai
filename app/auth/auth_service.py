@@ -4,12 +4,10 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 from dotenv import load_dotenv
-from werkzeug.security import (
-    generate_password_hash,
-    check_password_hash,
-)
+from werkzeug.security import check_password_hash
 
 from app.auth.user_repository import UserRepository
+from app.auth.password_utils import hash_password, verify_password
 
 
 # Load environment variables from .env
@@ -40,7 +38,8 @@ class AuthService:
         if existing_user:
             raise ValueError("Email is already registered")
 
-        password_hash = generate_password_hash(password)
+        # Hash the password using bcrypt
+        password_hash = hash_password(password)
 
         user_id = self.user_repository.create_user(
             email=email,
@@ -67,9 +66,26 @@ class AuthService:
             email.strip().lower()
         )
 
-        if user is None or not check_password_hash(
-            user["password_hash"], password
-        ):
+        if user is None:
+            raise ValueError("Invalid email or password")
+
+        stored_hash = user["password_hash"]
+
+        # Verify bcrypt hashes
+        if stored_hash.startswith(("$2a$", "$2b$", "$2y$")):
+            password_is_valid = verify_password(
+                password,
+                stored_hash,
+            )
+
+        # Support existing Werkzeug password hashes
+        else:
+            password_is_valid = check_password_hash(
+                stored_hash,
+                password,
+            )
+
+        if not password_is_valid:
             raise ValueError("Invalid email or password")
 
         if not self.secret_key:
