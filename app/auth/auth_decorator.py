@@ -42,3 +42,26 @@ def require_auth(view_function):
         return view_function(*args, **kwargs)
 
     return decorated_function
+
+
+def require_role(*allowed_roles):
+
+    def decorator(view_function):
+
+        @wraps(view_function)
+        @require_auth
+        def decorated_function(*args, **kwargs):
+
+            current_user = request.current_user
+            user_role = current_user.get("role")
+
+            if user_role not in allowed_roles:
+                return jsonify({
+                    "error": "You do not have permission to access this resource"
+                }), 403
+
+            return view_function(*args, **kwargs)
+
+        return decorated_function
+
+    return decorator
