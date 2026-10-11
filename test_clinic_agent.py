@@ -60,6 +60,14 @@ def test_unknown_message():
 def test_empty_message():
     response = get_response("")
     assert response == "Please enter a message."
+def test_missing_message_key():
+    result = clinic_graph.invoke({
+        "response": "",
+        "category": "",
+    })
+
+    assert result["category"] == "empty"
+    assert result["response"] == "Please enter a message."
 def test_appointment_routing():
     result = clinic_graph.invoke({
         "message": "I need an appointment",
