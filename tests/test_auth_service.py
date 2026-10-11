@@ -174,3 +174,12 @@ def test_verify_token_rejects_malformed_token():
 
     with pytest.raises(ValueError, match="Invalid token"):
         service.verify_token("this-is-not-a-valid-jwt")
+
+
+@pytest.mark.parametrize("token", [None, 123, [], {}])
+def test_verify_token_rejects_invalid_token_type(token):
+    service = AuthService()
+    service.secret_key = "test-secret-key-for-jwt-32-bytes-minimum"
+
+    with pytest.raises(ValueError, match="Token is required"):
+        service.verify_token(token)
