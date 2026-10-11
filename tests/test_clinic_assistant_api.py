@@ -67,3 +67,48 @@ def test_assistant_chat_requires_authentication():
     )
 
     assert response.status_code == 401
+def test_assistant_chat_rejects_missing_json_body():
+    client = app.test_client()
+
+    response = client.post(
+        "/api/assistant/chat",
+        data="hello",
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error"] == (
+        "Request body must be a JSON object"
+    )
+def test_assistant_chat_handles_unknown_question():
+    client = app.test_client()
+
+    with patch(
+        "app.api.clinic_assistant_api.assistant_service.get_response",
+        return_value=(
+            "I could not find a verified answer. "
+            "Please contact the clinic for assistance."
+        )
+    ):
+        response = client.post(
+            "/api/assistant/chat",
+            json={"message": "What is the weather on Mars?"},
+            headers=auth_headers()
+        )
+
+    assert response.status_code == 200
+    assert response.get_json()["response"] == (
+        "I could not find a verified answer. "
+        "Please contact the clinic for assistance."
+    )
+def test_assistant_chat_rejects_non_string_message():
+    client = app.test_client()
+
+    response = client.post(
+        "/api/assistant/chat",
+        json={"message": 12345},
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "Message is required"
