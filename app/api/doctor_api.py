@@ -1,5 +1,6 @@
 ﻿from flask import Blueprint, request, jsonify
 from app.services.doctor_service import DoctorService
+from app.auth.auth_decorator import require_role
 
 doctor_api = Blueprint("doctor_api", __name__)
 doctor_service = DoctorService()
@@ -21,6 +22,7 @@ def doctor_to_dict(doctor):
 
 
 @doctor_api.route("/doctors", methods=["POST"])
+@require_role("admin")
 def add_doctor():
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
@@ -66,6 +68,7 @@ def get_doctor_by_id(doctor_id):
 
 
 @doctor_api.route("/doctors/<int:doctor_id>", methods=["PUT"])
+@require_role("admin")
 def update_doctor(doctor_id):
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
@@ -95,6 +98,7 @@ def update_doctor(doctor_id):
 
 
 @doctor_api.route("/doctors/<int:doctor_id>", methods=["DELETE"])
+@require_role("admin")
 def delete_doctor(doctor_id):
     try:
         deleted = doctor_service.delete_doctor(doctor_id)

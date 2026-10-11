@@ -233,7 +233,7 @@ def test_get_doctors_endpoint():
 def test_create_doctor_requires_json_object():
     client = app.test_client()
 
-    response = client.post("/doctors", json=[])
+    response = client.post("/doctors", json=[], headers=auth_headers())
 
     assert response.status_code == 400
     assert response.get_json()["error"] == "A JSON object is required"
@@ -251,7 +251,7 @@ def test_get_nonexistent_doctor_returns_404():
 def test_update_doctor_requires_json_object():
     client = app.test_client()
 
-    response = client.put("/doctors/999999", json=[])
+    response = client.put("/doctors/999999", json=[], headers=auth_headers())
 
     assert response.status_code == 400
     assert response.get_json()["error"] == "A JSON object is required"
@@ -260,7 +260,7 @@ def test_update_doctor_requires_json_object():
 def test_delete_nonexistent_doctor_returns_404():
     client = app.test_client()
 
-    response = client.delete("/doctors/999999")
+    response = client.delete("/doctors/999999", headers=auth_headers())
 
     assert response.status_code == 404
     assert response.get_json()["error"] == "Doctor not found"
@@ -275,7 +275,7 @@ def test_create_doctor_success():
         "app.api.doctor_api.doctor_service.add_doctor",
         return_value=True
     ):
-        response = client.post("/doctors", json={
+        response = client.post("/doctors", headers=auth_headers(), json={
             "name": "Dr. Test Kumar",
             "specialization": "Cardiology",
             "phone": "9876543210",
@@ -322,7 +322,7 @@ def test_update_existing_doctor_success():
         "app.api.doctor_api.doctor_service.update_doctor",
         return_value=True
     ):
-        response = client.put("/doctors/101", json={
+        response = client.put("/doctors/101", headers=auth_headers(), json={
             "name": "Dr. Test Kumar",
             "specialization": "Cardiology",
             "phone": "9876543210",
@@ -342,7 +342,7 @@ def test_delete_existing_doctor_success():
         "app.api.doctor_api.doctor_service.delete_doctor",
         return_value=True
     ):
-        response = client.delete("/doctors/101")
+        response = client.delete("/doctors/101", headers=auth_headers())
 
     assert response.status_code == 200
     assert response.get_json()["message"] == "Doctor deleted successfully"
