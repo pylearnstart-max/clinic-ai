@@ -1,12 +1,14 @@
 import logging
 
 from flask import Flask, jsonify
+from werkzeug.exceptions import HTTPException
 
 from app.api.patient_api import patient_api
 from app.api.doctor_api import doctor_api
 from app.api.appointment_api import appointment_api
 from app.auth.auth_api import auth_api
 from app.api.clinic_assistant_api import clinic_assistant_api
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -22,10 +24,20 @@ app.register_blueprint(auth_api)
 app.register_blueprint(clinic_assistant_api)
 
 
-@app.errorhandler(500)
-def handle_internal_server_error(error):
-    app.logger.error("Internal server error: %s", error)
-    return jsonify({"error": "Internal server error"}), 500
+@app.errorhandler(HTTPException)
+def handle_http_error(error):
+    return jsonify({
+        "error": error.description
+    }), error.code
+
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(error):
+    app.logger.exception("Unhandled application error")
+
+    return jsonify({
+        "error": "Internal server error"
+    }), 500
 
 
 @app.route("/")
