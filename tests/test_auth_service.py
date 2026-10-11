@@ -49,3 +49,29 @@ def test_verify_token_rejects_invalid_signature():
     with pytest.raises(ValueError, match="Invalid token"):
         service.verify_token(token)
 
+
+
+@pytest.mark.parametrize("missing_claim", ["sub", "role", "iat", "exp"])
+def test_verify_token_rejects_missing_required_claim(missing_claim):
+    service = AuthService()
+    service.secret_key = "test-secret-key-for-jwt-32-bytes-minimum"
+
+    now = datetime.now(timezone.utc)
+
+    payload = {
+        "sub": "1",
+        "role": "user",
+        "iat": now,
+        "exp": now + timedelta(minutes=5),
+    }
+
+    payload.pop(missing_claim)
+
+    token = jwt.encode(
+        payload,
+        service.secret_key,
+        algorithm="HS256",
+    )
+
+    with pytest.raises(ValueError, match="Invalid token"):
+        service.verify_token(token)
