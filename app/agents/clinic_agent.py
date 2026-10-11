@@ -1,4 +1,3 @@
-
 from typing import TypedDict
 
 from langgraph.graph import StateGraph, START, END
@@ -117,12 +116,14 @@ def goodbye_node(state: ClinicState):
     }
 
 
-# 9. General message node
+# 9. General message node - Day 26 practice
 def general_node(state: ClinicState):
+    user_message = state["message"].strip()
+
     return {
         "response": (
-            "Thank you for contacting ClinicAI. "
-            "Please tell me how I can help you."
+            f"You said: '{user_message}'. "
+            "Please tell me how I can help you with your clinic-related questions."
         )
     }
 
