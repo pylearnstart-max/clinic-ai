@@ -23,13 +23,13 @@ def load_clinic_chunks() -> list[str]:
     return split_into_chunks(document)
 
 
-def retrieve_relevant_chunks(
+def retrieve_scored_chunks(
     question: str,
     chunks: list[str],
     model: TextEmbedding,
     top_k: int = 2,
-) -> list[str]:
-    """Retrieve chunks using embedding cosine similarity."""
+) -> list[tuple[str, float]]:
+    """Return relevant chunks with their cosine similarity scores."""
 
     if not question or not question.strip():
         return []
@@ -63,10 +63,28 @@ def retrieve_relevant_chunks(
     ranked_indices = np.argsort(similarities)[::-1]
 
     return [
-        chunks[index]
+        (chunks[index], float(similarities[index]))
         for index in ranked_indices[:top_k]
-        if similarities[index] > 0
+        if similarities[index] >= 0.50
     ]
+
+
+def retrieve_relevant_chunks(
+    question: str,
+    chunks: list[str],
+    model: TextEmbedding,
+    top_k: int = 2,
+) -> list[str]:
+    """Return relevant chunks without their similarity scores."""
+
+    scored_results = retrieve_scored_chunks(
+        question,
+        chunks,
+        model,
+        top_k,
+    )
+
+    return [chunk for chunk, score in scored_results]
 
 
 if __name__ == "__main__":
@@ -76,19 +94,19 @@ if __name__ == "__main__":
     chunks = load_clinic_chunks()
     question = "What are the clinic timings?"
 
-    results = retrieve_relevant_chunks(
+    results = retrieve_scored_chunks(
         question,
         chunks,
         embedding_model,
-        top_k=2,
+        top_k=3,
     )
 
     print(f"\nQuestion: {question}")
-    print("\nSemantically relevant information:")
+    print("\nSemantic search results:")
 
     if not results:
         print("No relevant information found.")
     else:
-        for index, result in enumerate(results, start=1):
-            print(f"\nResult {index}:")
-            print(result)
+        for index, (chunk, score) in enumerate(results, start=1):
+            print(f"\nResult {index} | Similarity: {score:.4f}")
+            print(chunk)
