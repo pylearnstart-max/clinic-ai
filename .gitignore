@@ -23,3 +23,9 @@ htmlcov/
 # Local test backups
 
 tests/backup_before_jwt_fix/
+# Temporary downloaded packages
+temp_wheels/
+
+# Local test backup files
+tests/*.bak
+*.bak

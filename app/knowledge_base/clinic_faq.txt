@@ -1,0 +1,16 @@
+﻿DEMO CLINIC INFORMATION
+This is sample information for learning and testing only.
+
+Clinic Timings:
+The demo clinic is open Monday to Saturday, from 9 AM to 6 PM.
+
+Appointment Policy:
+Patients should request an appointment before visiting.
+Appointment availability must be confirmed by clinic reception.
+
+Doctor Information:
+Doctor schedules may change. Users should contact clinic reception to confirm doctor availability.
+
+Emergency Policy:
+For a medical emergency, contact local emergency services or visit the nearest emergency department.
+The AI assistant must not diagnose conditions or prescribe medication.
