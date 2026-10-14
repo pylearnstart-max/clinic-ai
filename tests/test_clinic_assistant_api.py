@@ -142,3 +142,95 @@ def test_assistant_chat_logs_unexpected_error(caplog):
     }
     assert "Unexpected error in Clinic Assistant API" in caplog.text
     assert "simulated internal failure" in caplog.text
+
+def test_rag_api_returns_answer():
+    client = app.test_client()
+
+    with patch(
+        "app.api.clinic_assistant_api.rag_service.answer_question",
+        return_value=(
+            "Based on the demo clinic FAQ:\n\n"
+            "Clinic Timings: Monday to Saturday, 9 AM to 6 PM."
+        )
+    ):
+        response = client.post(
+            "/api/ai/ask",
+            json={"question": "What are the clinic timings?"},
+            headers=auth_headers()
+        )
+
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["question"] == "What are the clinic timings?"
+    assert "Clinic Timings" in data["answer"]
+
+
+def test_rag_api_requires_authentication():
+    client = app.test_client()
+
+    response = client.post(
+        "/api/ai/ask",
+        json={"question": "What are the clinic timings?"}
+    )
+
+    assert response.status_code == 401
+
+
+def test_rag_api_requires_question():
+    client = app.test_client()
+
+    response = client.post(
+        "/api/ai/ask",
+        json={},
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "Question is required"
+
+
+def test_rag_api_rejects_non_string_question():
+    client = app.test_client()
+
+    response = client.post(
+        "/api/ai/ask",
+        json={"question": 123},
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "Question is required"
+
+
+def test_rag_api_rejects_non_object_json():
+    client = app.test_client()
+
+    response = client.post(
+        "/api/ai/ask",
+        json=["hello"],
+        headers=auth_headers()
+    )
+
+    assert response.status_code == 400
+
+
+def test_rag_api_handles_unexpected_error(caplog):
+    client = app.test_client()
+
+    with patch(
+        "app.api.clinic_assistant_api.rag_service.answer_question",
+        side_effect=RuntimeError("simulated RAG failure")
+    ):
+        with caplog.at_level(logging.ERROR):
+            response = client.post(
+                "/api/ai/ask",
+                json={"question": "What are the clinic timings?"},
+                headers=auth_headers()
+            )
+
+    assert response.status_code == 500
+    assert response.get_json() == {
+        "error": "Internal server error"
+    }
+    assert "Unexpected error in ClinicAI RAG API" in caplog.text
+    assert "simulated RAG failure" in caplog.text
